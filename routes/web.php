@@ -1,27 +1,19 @@
 <?php
 
-use App\Enums\AssetAvailabilityStatus;
-use App\Enums\BorrowingStatus;
 use App\Http\Controllers\ProfileController;
-use App\Models\Asset;
-use App\Models\Borrowing;
+use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\HistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    $user = request()->user();
-    if ($user->hasRole('admin')) {
-        return view('dashboard', ['dashboard' => 'admin', 'summary' => ['assets' => Asset::count(), 'available_assets' => Asset::where('availability_status', AssetAvailabilityStatus::Tersedia)->count(), 'pending_borrowings' => Borrowing::where('status', BorrowingStatus::Pending)->count(), 'active_borrowings' => Borrowing::whereIn('status', [BorrowingStatus::Approved, BorrowingStatus::Borrowed, BorrowingStatus::ReturnPendingVerification])->count()]]);
-    }
-    $borrowings = Borrowing::where('borrower_user_id', $user->id);
-
-    return view('dashboard', ['dashboard' => $user->hasRole('guru') ? 'guru' : 'siswa', 'summary' => ['requests' => (clone $borrowings)->count(), 'active_borrowings' => (clone $borrowings)->where('status', BorrowingStatus::Borrowed)->count(), 'return_pending' => (clone $borrowings)->where('status', BorrowingStatus::ReturnPendingVerification)->count()]]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/notifications', [HistoryController::class, 'notifications'])->middleware('permission:notifications.view')->name('notifications.index');
+    Route::get('/admin/audit-logs', [HistoryController::class, 'audits'])->middleware(['role:admin', 'permission:audit.view'])->name('audit-logs.index');
     Route::view('/assets', 'assets.index')->middleware('permission:assets.view')->name('assets.index');
     Route::view('/assets/create', 'assets.create')->middleware(['role:admin', 'permission:assets.create'])->name('assets.create');
     Route::view('/assets/{asset}/edit', 'assets.edit')->middleware(['role:admin', 'permission:assets.update'])->name('assets.edit');
