@@ -7,19 +7,20 @@
         <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-slate-800 text-white' : 'hover:bg-slate-800' }}">Dashboard</a>
 
         @can('assets.view')
-            <span class="block rounded-lg px-3 py-2 text-sm text-slate-300">Assets</span>
+            <a href="{{ route('assets.index') }}" class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-800">Assets</a>
         @endcan
 
         @role('guru|siswa')
             @can('borrowings.create')
-                <span class="block rounded-lg px-3 py-2 text-sm text-slate-300">My Borrowings</span>
+                <a href="{{ route('borrowings.index') }}" class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-800">My Borrowings</a>
             @endcan
         @endrole
 
         @role('admin')
             <p class="px-3 pt-5 text-xs font-semibold uppercase tracking-wider text-slate-500">Administration</p>
-            <span class="mt-1 block rounded-lg px-3 py-2 text-sm">Asset Management</span>
-            <span class="block rounded-lg px-3 py-2 text-sm">Borrowing Approval</span>
+            <a href="{{ route('asset-categories.index') }}" class="mt-1 block rounded-lg px-3 py-2 text-sm hover:bg-slate-800">Asset Categories</a>
+            <a href="{{ route('assets.index') }}" class="block rounded-lg px-3 py-2 text-sm hover:bg-slate-800">Asset Management</a>
+            <a href="{{ route('admin.borrowings.pending') }}" class="block rounded-lg px-3 py-2 text-sm hover:bg-slate-800">Borrowing Approval</a>
             <span class="block rounded-lg px-3 py-2 text-sm">Audit Logs</span>
         @endrole
     </nav>
